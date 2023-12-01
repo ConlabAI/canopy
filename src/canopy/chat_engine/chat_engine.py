@@ -191,7 +191,7 @@ class ChatEngine(BaseChatEngine):
             ...     print(chunk.json())
         """  # noqa: E501
         context = self._get_context(messages)
-        system_prompt = self.system_prompt_template + f"\nContext: {context.to_text()}"
+        system_prompt = self.system_prompt_template + f"\nContext: {context.to_text(ensure_ascii=False)}"
         llm_messages = self._prompt_builder.build(
             system_prompt,
             messages,
