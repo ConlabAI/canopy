@@ -10,7 +10,7 @@ packages = [{include = "canopy", from = "src"},
             {include = "canopy_server", from = "src"},]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.9,<3.12"
 pinecone-client = "^2.2.2"
 python-dotenv = "^1.0.0"
 openai = "^1.2.3"
@@ -33,6 +33,7 @@ pinecone-text = "^0.7.0"
 tokenizers = "^0.15.0"
 transformers = "^4.35.2"
 sentencepiece = "^0.1.99"
+langfuse = "^1.10.0"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
