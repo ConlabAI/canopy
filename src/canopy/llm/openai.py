@@ -2,7 +2,7 @@ from copy import deepcopy
 from typing import Union, Iterable, Optional, Any, Dict, List, cast
 
 import jsonschema
-import openai
+from langfuse.openai import openai
 import json
 
 from openai.types.chat import ChatCompletionToolParam
@@ -24,7 +24,7 @@ class OpenAILLM(BaseLLM):
     Note: OpenAI requires a valid API key to use this class.
           You can set the "OPENAI_API_KEY" environment variable to your API key.
           Or you can directly set it as follows:
-          >>> import openai
+          >>> from langfuse.openai import openai
           >>> openai.api_key = "YOUR_API_KEY"
     """
     def __init__(self,

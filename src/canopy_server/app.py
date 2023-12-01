@@ -4,7 +4,7 @@ import signal
 import sys
 import uuid
 
-import openai
+from langfuse.openai import openai
 from multiprocessing import current_process, parent_process
 
 import yaml
