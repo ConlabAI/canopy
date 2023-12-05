@@ -1,0 +1,1 @@
+uvicorn canopy_server.app:app --host localhost --port 8000 --reload
