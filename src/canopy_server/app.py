@@ -4,7 +4,10 @@ import signal
 import sys
 import uuid
 
+from langfuse import Langfuse
 from langfuse.openai import openai
+from langfuse.model import CreateTrace
+
 from multiprocessing import current_process, parent_process
 
 import yaml
@@ -94,6 +97,7 @@ llm: BaseLLM
 # Global variables - Logging
 logger: logging.Logger
 
+langfuse = Langfuse()
 
 @openai_api_router.post(
     "/chat/completions",
@@ -114,6 +118,13 @@ async def chat(
         session_id = request.user or "None"  # noqa: F841
         question_id = str(uuid.uuid4())
         trace_id = question_id
+
+        langfuse.trace(CreateTrace(
+            id=trace_id,
+            name="",
+            userId=session_id,
+            metadata={}
+        ))
 
         # Langfuse parameters https://langfuse.com/docs/openai
         model_params = {"name": "Answer", "trace_id": trace_id}

@@ -219,9 +219,9 @@ class ChatEngine(BaseChatEngine):
 
     def _get_context(self,
                      messages: Messages,
-                     trace_id,
+                     trace_id
                      ) -> Context:
-        
+
         # Langfuse parameters https://langfuse.com/docs/openai
         model_params = {"name": "QueryBuilder", "trace_id": trace_id}
 
