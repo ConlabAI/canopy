@@ -7,10 +7,11 @@ readme = "README.md"
 license = "Apache-2.0"
 packages = [{include = "canopy", from = "src"},
             {include = "canopy_cli", from = "src"},
-            {include = "canopy_server", from = "src"},]
+            {include = "canopy_server", from = "src"},
+            {include = "evaluation", from = "src"},]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.9,<3.12"
 pinecone-client = "^2.2.2"
 python-dotenv = "^1.0.0"
 openai = "^1.2.3"
@@ -33,6 +34,8 @@ pinecone-text = "^0.7.0"
 tokenizers = "^0.15.0"
 transformers = "^4.35.2"
 sentencepiece = "^0.1.99"
+langfuse = "^1.10.0"
+httpx = "^0.25.0"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
@@ -46,7 +49,6 @@ pytest-asyncio = "^0.14.0"
 pytest-mock = "^3.6.1"
 pytest-xdist = "^3.3.1"
 types-requests = "^2.31.0.2"
-httpx = "^0.25.0"
 pydoclint = "^0.3.8"
 
 [build-system]
@@ -85,4 +87,4 @@ skip-checking-raises = true
 
 [tool.poetry.scripts]
 canopy = "canopy_cli.cli:cli"
-
+evaluate = "evaluation.evaluate:evaluate"

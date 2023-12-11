@@ -4,7 +4,10 @@ import signal
 import sys
 import uuid
 
-import openai
+from langfuse import Langfuse
+from langfuse.openai import openai
+from langfuse.model import CreateTrace
+
 from multiprocessing import current_process, parent_process
 
 import yaml
@@ -52,7 +55,9 @@ from canopy import __version__
 APIChatResponse = Union[ChatResponse, EventSourceResponse]
 
 load_dotenv()  # load env vars before import of openai
+
 openai.api_key = os.getenv("OPENAI_API_KEY")
+CE_DEBUG_INFO = os.getenv("CE_DEBUG_INFO", "FALSE").lower() == "true"
 
 APP_DESCRIPTION = """
 Canopy is an open-source Retrieval Augmented Generation (RAG) framework and context engine built on top of the Pinecone vector database. Canopy enables you to quickly and easily experiment with and build applications using RAG. Start chatting with your documents or text data with a few simple commands.
@@ -94,6 +99,7 @@ llm: BaseLLM
 # Global variables - Logging
 logger: logging.Logger
 
+langfuse = Langfuse()
 
 @openai_api_router.post(
     "/chat/completions",
@@ -113,9 +119,28 @@ async def chat(
     try:
         session_id = request.user or "None"  # noqa: F841
         question_id = str(uuid.uuid4())
+        trace_id = question_id
+
+        trace_name: str = ""
+
+        if CE_DEBUG_INFO:
+            trace_name = "Evaluation"
+        else:
+            trace_name = "Assistance"
+
+        langfuse.trace(CreateTrace(
+            id=trace_id,
+            name=trace_name,
+            userId=session_id,
+            metadata={}
+        ))
+
+        # Langfuse parameters https://langfuse.com/docs/openai
+        model_params = {"name": "Answer", "trace_id": trace_id}
+
         logger.debug(f"Received chat request: {request.messages[-1].content}")
         answer = await run_in_threadpool(
-            chat_engine.chat, messages=request.messages, stream=request.stream
+            chat_engine.chat, messages=request.messages, stream=request.stream, model_params=model_params
         )
 
         if request.stream:
@@ -132,6 +157,9 @@ async def chat(
         else:
             chat_response = cast(ChatResponse, answer)
             chat_response.id = question_id
+
+            logger.info(f"Debug var:{CE_DEBUG_INFO}")
+
             return chat_response
 
     except Exception as e:

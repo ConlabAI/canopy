@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
@@ -9,6 +10,7 @@ from canopy.knowledge_base.base import BaseKnowledgeBase
 from canopy.models.data_models import Context, Query
 from canopy.utils.config import ConfigurableMixin
 
+load_dotenv()
 CE_DEBUG_INFO = os.getenv("CE_DEBUG_INFO", "FALSE").lower() == "true"
 
 

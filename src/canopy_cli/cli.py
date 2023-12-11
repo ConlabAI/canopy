@@ -14,7 +14,7 @@ from tenacity import retry, stop_after_attempt, wait_fixed
 from tqdm import tqdm
 
 import pandas as pd
-import openai
+from langfuse.openai import openai
 from openai import APIError as OpenAI_APIError
 from urllib.parse import urljoin
 

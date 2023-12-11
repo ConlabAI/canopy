@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 from abc import ABC, abstractmethod
 from typing import Iterable, Union, Optional, cast
 
@@ -14,6 +15,8 @@ from canopy.models.api_models import (StreamingChatChunk, ChatResponse,
 from canopy.models.data_models import Context, Messages, SystemMessage
 from canopy.utils.config import ConfigurableMixin
 
+
+load_dotenv()
 CE_DEBUG_INFO = os.getenv("CE_DEBUG_INFO", "FALSE").lower() == "true"
 
 
@@ -190,8 +193,9 @@ class ChatEngine(BaseChatEngine):
             >>> for chunk in response.chunks:
             ...     print(chunk.json())
         """  # noqa: E501
-        context = self._get_context(messages)
-        system_prompt = self.system_prompt_template + f"\nContext: {context.to_text()}"
+        trace_id = model_params['trace_id']
+        context = self._get_context(messages, trace_id)
+        system_prompt = self.system_prompt_template + f"\nContext: {context.to_text(ensure_ascii=False)}"
         llm_messages = self._prompt_builder.build(
             system_prompt,
             messages,
@@ -202,6 +206,7 @@ class ChatEngine(BaseChatEngine):
                                                 stream=stream,
                                                 model_params=model_params)
         debug_info = {}
+
         if CE_DEBUG_INFO:
             debug_info['context'] = context.dict()
             debug_info['context'].update(context.debug_info)
@@ -218,8 +223,13 @@ class ChatEngine(BaseChatEngine):
 
     def _get_context(self,
                      messages: Messages,
+                     trace_id
                      ) -> Context:
-        queries = self._query_builder.generate(messages, self.max_prompt_tokens)
+
+        # Langfuse parameters https://langfuse.com/docs/openai
+        model_params = {"name": "QueryBuilder", "trace_id": trace_id}
+
+        queries = self._query_builder.generate(messages, self.max_prompt_tokens, model_params=model_params)
         context = self.context_engine.query(queries, self.max_context_tokens)
         return context
 
