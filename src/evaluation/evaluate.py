@@ -1,6 +1,5 @@
 import os
 import json
-import csv
 from datetime import datetime
 
 import httpx
@@ -75,15 +74,8 @@ def evaluate():
 
                 # Extract the output content from the response
                 item_data['output'] = response['choices'][0]['message']['content']
-
-                # Extract the context content from the response
-                # Format context items for better readability
-                context_items = [
-                    json.dumps(item, ensure_ascii=False, indent=2)
-                    for item in response['debug_info']['context']['content']
-                ]
-                context = '\n'.join(context_items)
-                item_data['context'] = context
+                item_data['context'] = response['debug_info']['context']['content']
+                item_data['query_results'] = response['debug_info']['context']['query_results']
 
                 output_block = (
                     f"\n{click.style('ANSWER', fg='yellow')}\n"
@@ -108,29 +100,19 @@ def evaluate():
                 click.echo(click.style(f"Error processing item {item.id}: {e}", fg='red'))
                 item_data['output'] = None
                 item_data['context'] = None
+                item_data['query_results'] = None
 
             # Append the processed data to the evaluation_data list
             evaluation_data.append(item_data)
 
         os.makedirs('evaluations', exist_ok=True)
 
-        # Write the data to a CSV file
+        # Write the data to a JSON file
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"evaluations/evaluation_{timestamp}.csv"
+        filename = f"evaluations/evaluation_{timestamp}.json"
 
-        with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
-            fieldnames = ['item_id', 'input', 'expected_output', 'output', 'context']
-            writer = csv.DictWriter(
-                csvfile,
-                fieldnames=fieldnames,
-                quoting=csv.QUOTE_NONE,
-                escapechar='\\',
-                delimiter=';'
-            )
-
-            writer.writeheader()
-            for data in evaluation_data:
-                writer.writerow(data)
+        with open(filename, 'w', encoding='utf-8') as jsonfile:
+            json.dump(evaluation_data, jsonfile, ensure_ascii=False, indent=4)
 
         click.echo(click.style(f"\nEvaluation finished. Data has been saved to {filename}", fg='blue'))
 
