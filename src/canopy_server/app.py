@@ -55,7 +55,9 @@ from canopy import __version__
 APIChatResponse = Union[ChatResponse, EventSourceResponse]
 
 load_dotenv()  # load env vars before import of openai
+
 openai.api_key = os.getenv("OPENAI_API_KEY")
+CE_DEBUG_INFO = os.getenv("CE_DEBUG_INFO", "FALSE").lower() == "true"
 
 APP_DESCRIPTION = """
 Canopy is an open-source Retrieval Augmented Generation (RAG) framework and context engine built on top of the Pinecone vector database. Canopy enables you to quickly and easily experiment with and build applications using RAG. Start chatting with your documents or text data with a few simple commands.
@@ -119,9 +121,16 @@ async def chat(
         question_id = str(uuid.uuid4())
         trace_id = question_id
 
+        trace_name: str = ""
+
+        if CE_DEBUG_INFO:
+            trace_name = "Evaluation"
+        else:
+            trace_name = "Assistance"
+
         langfuse.trace(CreateTrace(
             id=trace_id,
-            name="",
+            name=trace_name,
             userId=session_id,
             metadata={}
         ))
@@ -148,6 +157,9 @@ async def chat(
         else:
             chat_response = cast(ChatResponse, answer)
             chat_response.id = question_id
+
+            logger.info(f"Debug var:{CE_DEBUG_INFO}")
+
             return chat_response
 
     except Exception as e:

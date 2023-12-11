@@ -165,3 +165,6 @@ cython_debug/
 datafiles/*
 canopy-api-docs.html
 .vscode/
+
+# Evaluations 
+/evaluations

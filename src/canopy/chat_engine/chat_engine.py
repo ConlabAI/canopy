@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 from abc import ABC, abstractmethod
 from typing import Iterable, Union, Optional, cast
 
@@ -14,6 +15,8 @@ from canopy.models.api_models import (StreamingChatChunk, ChatResponse,
 from canopy.models.data_models import Context, Messages, SystemMessage
 from canopy.utils.config import ConfigurableMixin
 
+
+load_dotenv()
 CE_DEBUG_INFO = os.getenv("CE_DEBUG_INFO", "FALSE").lower() == "true"
 
 
@@ -203,6 +206,7 @@ class ChatEngine(BaseChatEngine):
                                                 stream=stream,
                                                 model_params=model_params)
         debug_info = {}
+
         if CE_DEBUG_INFO:
             debug_info['context'] = context.dict()
             debug_info['context'].update(context.debug_info)
