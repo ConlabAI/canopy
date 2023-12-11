@@ -3,7 +3,7 @@ name: Build and Push Docker Image
 on:
   push:
     branches:
-      - main
+      - conlab-main
     tags:
       - 'v*'
   workflow_dispatch:
@@ -27,7 +27,7 @@ jobs:
           echo "DOCKER_TAG=$REPO_NAME:$GIT_REF" >> $GITHUB_ENV
       
       - name: replace docker tag if main
-        if: github.ref_name == 'main'
+        if: github.ref_name == 'conlab-main'
         run: |
           echo "DOCKER_TAG=$REPO_NAME:latest" >> $GITHUB_ENV
 
