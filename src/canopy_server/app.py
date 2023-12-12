@@ -158,8 +158,6 @@ async def chat(
             chat_response = cast(ChatResponse, answer)
             chat_response.id = question_id
 
-            logger.info(f"Debug var:{CE_DEBUG_INFO}")
-
             return chat_response
 
     except Exception as e:
